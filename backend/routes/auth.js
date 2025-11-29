@@ -37,7 +37,8 @@ router.post('/register', async (req, res) => {
       encryptKey: process.env.ENCRYPT_KEY
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Register Error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
@@ -74,7 +75,8 @@ router.post('/login', async (req, res) => {
       encryptKey: process.env.ENCRYPT_KEY
     });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    console.error('Login Error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 
