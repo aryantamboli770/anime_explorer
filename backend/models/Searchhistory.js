@@ -1,23 +1,22 @@
-const {sequelize} = require('../config/db');
-const {DataTypes} = require('sequelize');
+const mongoose = require('mongoose');
 
-const  SearchHistory = sequelize.define('SearchHistory',{
- 
-  userId:{
-      type : DataTypes.INTEGER,
-      allowNull :false
+const searchHistorySchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
-  query:{
-       type  : DataTypes.STRING,
-       allowNull:false
+  query: {
+    type: String,
+    required: true
   },
-  timestamp:{
-
-    type : DataTypes.DATE,
-    defaultValue:DataTypes.NOW
+  timestamp: {
+    type: Date,
+    default: Date.now
   }
-
-
-
 });
-module.exports  = SearchHistory;
+
+// Index for faster queries
+searchHistorySchema.index({ userId: 1, timestamp: -1 });
+
+module.exports = mongoose.model('SearchHistory', searchHistorySchema);

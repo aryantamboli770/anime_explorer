@@ -1,42 +1,37 @@
-const bcrypt = require('bcrypt.js');
-const {sequelize} = require('../config/db');
-const {DataTypes} = require('sequelize');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-const User = sequelize.define('User',{
- id : {
-     type: DataTypes.INTEGER,
-     primaryKey : true,
-     autoIncrement : true
- },
- email:{
-     
-type : DataTypes.STRING,
-unique : true,
-allowNull : false
-
- },
- password:{
-type : DataTypes.STRING,
-allowNull : false
- },
- joined:{
-     type : DataTypes.DATE,
-     defaultValue : DataTypes.NOW
- }
-
-
-
-
+const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: 6
+  },
+  joined: {
+    type: Date,
+    default: Date.now
+  }
 });
 
-User.beforeCreate(async (user) => {
+// Hash password before saving
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
 
-  user.password = await bcrypt.hash(user.password,10);
-}); 
-
-User.prototype.comparePassword = async function(password){
-  return await bcrypt.compare(password,this.password);
+// Method to compare passwords
+userSchema.methods.comparePassword = async function(password) {
+  return await bcrypt.compare(password, this.password);
 };
 
-
-module.exports = User;
+module.exports = mongoose.model('User', userSchema);
