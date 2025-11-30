@@ -16,7 +16,6 @@ const searchHistorySchema = new mongoose.Schema({
   }
 });
 
-// Index for faster queries
 searchHistorySchema.index({ userId: 1, timestamp: -1 });
 
 module.exports = mongoose.model('SearchHistory', searchHistorySchema);
